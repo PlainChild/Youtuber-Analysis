@@ -1,0 +1,132 @@
+import pandas as pd
+from googleapiclient.discovery import build
+import time
+
+# INPUT YOUR API KEY
+API_KEY = " "
+youtube = build('youtube', 'v3', developerKey=API_KEY) # Youtube API
+
+# Function for getting Channel's ID
+def get_channel_id(row):
+    try:
+        # Get the username/identifier from the row's 'CHANNEL USERNAME' column
+        identifier = row['CHANNEL USERNAME'].strip()
+
+        # Check if the identifier is already a YouTube channel ID:starts with "UC" and is 24 letters
+        if identifier.startswith('UC') and len(identifier) == 24:
+            # If it is a valid channel ID, use it
+            return identifier
+
+        # If not a channel ID, then search the channel using Username, else Channel Name
+        for query in [identifier, row['CHANNEL NAME'].strip()]:
+            # Setup YouTube API to search the channel
+            result = youtube.search().list(
+                q=query,          # The search query (username or channel name)
+                type='channel',   # Only search for channels
+                part='id',        # Request the channel IDs
+                maxResults=1      # Get the top result
+                ).execute()       # Execute the Setup
+
+            # If the search returned any items (the channel matched)
+            if result.get('items'):
+                # Return the channel ID
+                return result['items'][0]['id']['channelId']
+        return None
+    except:
+        return None
+
+# Function for getting Channel's Stats
+def get_video_stats(channel_id):
+    try:
+        # Get the channel's uploads playlist ID
+        uploads_id = youtube.channels().list(
+            id=channel_id,               # The channel ID we are checking
+            part='contentDetails'        # Request the playlist info
+        ).execute(                       # Execute the Setup
+        )['items'][0]['contentDetails']['relatedPlaylists']['uploads']  # Extract uploads ID
+
+        # Get recent video IDs from the uploads playlist
+        video_ids = [i['contentDetails']['videoId'] for i in youtube.playlistItems().list(
+            playlistId=uploads_id,       # The uploads playlist we just got
+            part='contentDetails',       # Request the video info
+            maxResults=20                # Get 20 most recent videos
+        ).execute()['items']]
+
+        # Get statistics of all videos
+        stats = youtube.videos().list(
+            id=','.join(video_ids),      # Combine all video IDs
+            part='statistics,snippet'    # Get both stats and publish dates
+        ).execute()['items']
+
+        # Create Variables needed
+        views = likes = comments = 0
+        dates = []
+
+        # Calculate all videos stats
+        for v in stats:
+            # Sum up views (default to 0 if any error)
+            views += int(v['statistics'].get('viewCount', 0))
+            # Sum up likes (default to 0 if any error)
+            likes += int(v['statistics'].get('likeCount', 0))
+            # Sum up comments (default to 0 if any error)
+            comments += int(v['statistics'].get('commentCount', 0))
+            # Collect all publish dates
+            dates.append(v['snippet']['publishedAt'])
+
+        # Return all calculation variables
+        return views, likes, comments, dates
+    except:
+        return 0, 0, 0, []
+
+# Load the original dataset
+df = pd.read_csv('https://raw.githubusercontent.com/PlainChild/Youtuber-Analysis/refs/heads/main/CSV%20Top%20100%20ID%20Youtuber.csv',
+                 sep=';',              # The Separator is ;
+                 encoding='utf-8-sig') # The format is UTF 8
+
+# Add new columns that we need
+df['Total Recent Views'] = 0
+df['Total Recent Likes'] = 0
+df['Total Recent Comments'] = 0
+df['Earliest Video Date'] = "N/A"
+df['Newest Video Date'] = "N/A"
+
+# Loop through each row in the DataFrame
+for index, row in df.iterrows():
+    # Message showing progress
+    print(f"\nProcessing rank {row['RANK']}: {row['CHANNEL NAME'].strip()}")
+
+    try:
+        # Channel ID request
+        channel_id = get_channel_id(row)
+
+        # If we got a valid channel ID, then get needed stats of recent videos
+        if channel_id:
+            views, likes, comments, dates = get_video_stats(channel_id)
+
+            # Get the date
+            # - Extract just the first 10 chars from the date format (YYYY-MM-DD)
+            earliest_date = min(dates)[:10] if dates else "N/A"
+            newest_date = max(dates)[:10] if dates else "N/A"
+
+            # fiLL the new columns with the data of youtube stats
+            df.at[index, 'Total Recent Views'] = views
+            df.at[index, 'Total Recent Likes'] = likes
+            df.at[index, 'Total Recent Comments'] = comments
+            df.at[index, 'Earliest Video Date'] = earliest_date
+            df.at[index, 'Newest Video Date'] = newest_date
+    
+    # Keep the default values (0 and "N/A")
+    except Exception as e:
+        print(f"Error processing row {row['RANK']}: {str(e)}")
+    
+    # Delay the loop process by 2 seconds for better management of API quota
+    time.sleep(2)
+
+# Save the updated DataFrame back to the original CSV file
+df.to_csv('Python-Top 100 ID Youtuber.csv',
+          sep=';',              # Maintain the same separator
+          index=False,          # Exclude the index column
+          encoding='utf-8-sig') # Maintain the same encoding
+
+print("\nProcess complete, CSV File has been created.")
+display(df)
