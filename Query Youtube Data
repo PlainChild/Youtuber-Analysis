@@ -1,0 +1,25 @@
+-- 1. Remove rows with N/A in date fields
+DELETE FROM Top_YT_Data 
+WHERE Earliest_Video_Date = 'N/A' OR Newest_Video_Date = 'N/A';
+GO
+-- 2. Create a view table 
+CREATE VIEW View_Top_YT_Data AS
+SELECT 
+    [RANK],
+    CHANNEL_NAME,
+    SUBSCRIBERS,
+    TOTAL_RECENT_VIEWS,
+    TOTAL_RECENT_LIKES,
+    TOTAL_RECENT_COMMENTS,
+    CONVERT(DATE, EARLIEST_VIDEO_DATE, 103) AS EARLIEST_VIDEO_DATE, -- 3. Since "N/A" is no more, we can convert it into date data type
+	CONVERT(DATE, NEWEST_VIDEO_DATE, 103) AS NEWEST_VIDEO_DATE -- Convert Date column as date
+FROM Top_YT_Data;
+GO
+
+-- Check the view
+SELECT * FROM [View_Top_YT_Data] ORDER BY RANK;
+GO
+
+-- Check Data type
+EXEC sp_help 'View_Top_YT_Data';
+GO
