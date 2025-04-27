@@ -1,14 +1,14 @@
 -- 1. Create the database
-CREATE DATABASE Youtuber; -- input database name as you want
+CREATE DATABASE [Database-youtube_data_indonesia]; -- input database name as you want
 GO
 
 -- 2. Use the database
-USE Youtuber;
+USE Youtuber [Database-youtube_data_indonesia];
 GO
 
 -- 3. Import the CSV file
 
--- 4. Data cleaning, remove rows with N/A in date fields
+-- 4. Remove rows with N/A in date fields
 DELETE FROM [Table-youtube_data_indonesia]
 WHERE Earliest_Video_Date = 'N/A' OR Newest_Video_Date = 'N/A';
 GO
@@ -16,6 +16,7 @@ GO
 -- 5. Create a new View table
 CREATE VIEW [View-youtube_data_indonesia] AS
 SELECT 
+
 -- 6. Adjust each data type
     [RANK],
     CHANNEL_NAME,
@@ -23,15 +24,11 @@ SELECT
     TOTAL_RECENT_VIEWS,
     TOTAL_RECENT_LIKES,
     TOTAL_RECENT_COMMENTS,
-    CAST (Earliest_Video_Date AS DATE) AS EARLIEST_VIDEO_DATE, -- Since "N/A" is no more, we can convert it into date data type
-	CAST(Newest_Video_Date AS DATE) AS NEWEST_VIDEO_DATE -- Also convert into date
-FROM [Table-youtube_data_indonesia] D;
+    CAST (Earliest_Video_Date AS DATE) AS EARLIEST_VIDEO_DATE, 		    -- Since "N/A" is no more, we can convert it into date data type
+	CAST(Newest_Video_Date AS DATE) AS NEWEST_VIDEO_DATE 		        -- Also convert into date
+FROM [Table-youtube_data_indonesia];
 GO
 
-drop view [View-youtube_data_indonesia];
-
+--7. Check View Table and Each Data type
 SELECT * FROM [View-youtube_data_indonesia];
-
---6. Check Data type
 EXEC sp_help 'View-youtube_data_indonesia';
-GO
