@@ -79,7 +79,7 @@ def get_video_stats(channel_id):
         return 0, 0, 0, []
 
 # Load the original dataset
-df = pd.read_csv('https://raw.githubusercontent.com/PlainChild/Youtuber-Analysis/refs/heads/main/CSV%20Top%20100%20ID%20Youtuber.csv',
+df = pd.read_csv('https://raw.githubusercontent.com/PlainChild/Youtuber-Analysis/refs/heads/main/assets/Dataset/CSV-Top%20100%20ID%20Youtuber.csv',
                  sep=';',              # The Separator is ;
                  encoding='utf-8-sig') # The format is UTF 8
 
