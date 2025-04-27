@@ -79,7 +79,7 @@ def get_video_stats(channel_id):
         return 0, 0, 0, []
 
 # Load the original dataset
-df = pd.read_csv('https://raw.githubusercontent.com/PlainChild/Youtuber-Analysis/refs/heads/main/assets/Dataset/Excel-Dataset.csv',sep=';') # The Separator is ;
+df = pd.read_csv('https://raw.githubusercontent.com/PlainChild/Youtuber-Analysis/refs/heads/main/assets/Dataset/Excel-Dataset.csv',sep=';') # What is the Separator in CSV, either (;) or (,)
 
 # Add new columns that we need
 df['Total Recent Views'] = 0
