@@ -126,7 +126,7 @@ for index, row in df.iterrows():
 df.to_csv('Python-Top 100 ID Youtuber.csv',
           sep=';',              # Maintain the same separator
           index=False,          # Exclude the index column
-          encoding='utf-8-sig') # Maintain the same encoding
+          encoding='utf-8') # Maintain the same encoding
 
 print("\nProcess complete, CSV File has been created.")
 display(df)
