@@ -1,20 +1,20 @@
 -- 1. Create the database
-CREATE DATABASE [Database-youtube_data_indonesia]; -- input database name as you want
+CREATE DATABASE [Database-youtube_data_indonesia]; -- Name of the database as you want
 GO
 
 -- 2. Use the database
-USE Youtuber [Database-youtube_data_indonesia];
+USE [Database-youtube_data_indonesia];
 GO
 
 -- 3. Import the CSV file
 
 -- 4. Remove rows with N/A in date fields
-DELETE FROM [Table-youtube_data_indonesia]
+DELETE FROM [Table-youtube_data_indonesia] -- Table Name filled with CSV Data
 WHERE Earliest_Video_Date = 'N/A' OR Newest_Video_Date = 'N/A';
 GO
 
--- 5. Create a new View table
-CREATE VIEW [View-youtube_data_indonesia] AS
+-- 5. Create a View table
+CREATE VIEW [View-youtube_data_indonesia] AS --  Name of the View table as you want
 SELECT 
 
 -- 6. Adjust each data type
