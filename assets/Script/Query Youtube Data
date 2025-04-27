@@ -1,25 +1,35 @@
--- 1. Remove rows with N/A in date fields
-DELETE FROM Top_YT_Data 
+-- 1. Create the database
+CREATE DATABASE Youtuber; -- input database name as you want
+GO
+
+-- 2. Use the database
+USE Youtuber;
+GO
+
+-- 3. Import the CSV file
+
+-- 4. Data cleaning, remove rows with N/A in date fields
+DELETE FROM [Table-youtube_data_indonesia]
 WHERE Earliest_Video_Date = 'N/A' OR Newest_Video_Date = 'N/A';
 GO
--- 2. Create a view table 
-CREATE VIEW View_Top_YT_Data AS
+
+-- 5. Create a new View table
+CREATE VIEW [View-youtube_data_indonesia] AS
 SELECT 
     [RANK],
     CHANNEL_NAME,
-    FOLLOWERS,
+	CAST(REPLACE(FOLLOWERS, 'M', '') AS FLOAT) AS Followers,
     TOTAL_RECENT_VIEWS,
     TOTAL_RECENT_LIKES,
     TOTAL_RECENT_COMMENTS,
-    CONVERT(DATE, EARLIEST_VIDEO_DATE, 103) AS EARLIEST_VIDEO_DATE, -- 3. Since "N/A" is no more, we can convert it into date data type
-	CONVERT(DATE, NEWEST_VIDEO_DATE, 103) AS NEWEST_VIDEO_DATE -- Convert Date column as date
-FROM Top_YT_Data;
+-- 6. Since "N/A" is no more, we can convert it into date data type
+    CAST (Earliest_Video_Date AS DATE) AS EARLIEST_VIDEO_DATE, 
+	CAST(Newest_Video_Date AS DATE) AS NEWEST_VIDEO_DATE -- Also convert Date column as date
+FROM [Table-youtube_data_indonesia] D;
 GO
 
--- Check the view
-SELECT * FROM [View_Top_YT_Data] ORDER BY RANK;
-GO
+SELECT * FROM [View-youtube_data_indonesia];
 
--- Check Data type
-EXEC sp_help 'View_Top_YT_Data';
+--6. Check Data type
+EXEC sp_help 'View-youtube_data_indonesia';
 GO
