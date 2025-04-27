@@ -16,17 +16,19 @@ GO
 -- 5. Create a new View table
 CREATE VIEW [View-youtube_data_indonesia] AS
 SELECT 
+-- 6. Adjust each data type
     [RANK],
     CHANNEL_NAME,
-	CAST(REPLACE(FOLLOWERS, 'M', '') AS FLOAT) AS Followers,
+	CAST(REPLACE(FOLLOWERS, 'M', '') AS FLOAT) AS FOLLOWERS_IN_MILLION, -- Convert into Float
     TOTAL_RECENT_VIEWS,
     TOTAL_RECENT_LIKES,
     TOTAL_RECENT_COMMENTS,
--- 6. Since "N/A" is no more, we can convert it into date data type
-    CAST (Earliest_Video_Date AS DATE) AS EARLIEST_VIDEO_DATE, 
-	CAST(Newest_Video_Date AS DATE) AS NEWEST_VIDEO_DATE -- Also convert Date column as date
+    CAST (Earliest_Video_Date AS DATE) AS EARLIEST_VIDEO_DATE, -- Since "N/A" is no more, we can convert it into date data type
+	CAST(Newest_Video_Date AS DATE) AS NEWEST_VIDEO_DATE -- Also convert into date
 FROM [Table-youtube_data_indonesia] D;
 GO
+
+drop view [View-youtube_data_indonesia];
 
 SELECT * FROM [View-youtube_data_indonesia];
 
