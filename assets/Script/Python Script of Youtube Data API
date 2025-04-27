@@ -121,8 +121,7 @@ for index, row in df.iterrows():
     time.sleep(2)
 
 # Save the updated DataFrame back to the original CSV file
-df.to_csv('Python-Top 100 ID Youtuber.csv',index=False          # Exclude the index column
-          ) # Maintain the same encoding
+df.to_csv('Python-Top 100 ID Youtuber.csv',index=False)   # Exclude the index column
 
 print("\nProcess complete, CSV File has been created.")
 display(df)
